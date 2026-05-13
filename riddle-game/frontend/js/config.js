@@ -1,4 +1,3 @@
-// FRONTEND CONFIG
 const CONFIG = {
-  API_URL: 'http://localhost:3001/api'
+  API_URL: 'https://TU-BACKEND.vercel.app/api'
 };
