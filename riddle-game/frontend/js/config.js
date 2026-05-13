@@ -1,3 +1,4 @@
+// FRONTEND CONFIG
 const CONFIG = {
-  API_URL: 'https://TU-BACKEND.vercel.app/api'
+  API_URL: 'https://juegoacertijos-paoe.vercel.app/api'
 };
