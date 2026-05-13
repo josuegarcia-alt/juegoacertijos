@@ -26,7 +26,7 @@ router.post('/register', async (req, res) => {
     if (error) throw error;
 
     // Insert into users table
-    await supabase.from('users').insert({
+    const { error: insertError } = await supabase.from('users').insert({
       id: data.user.id,
       email: data.user.email,
       username,
@@ -34,6 +34,12 @@ router.post('/register', async (req, res) => {
       total_score: 0,
       games_played: 0
     });
+
+    if (insertError) {
+      // Si falla el insert, eliminar el usuario de Auth para no dejar inconsistencias
+      await supabase.auth.admin.deleteUser(data.user.id);
+      throw new Error('Error al crear el perfil de usuario: ' + insertError.message);
+    }
 
     res.status(201).json({
       message: 'User registered successfully',
