@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth');
 const historyRoutes = require('./routes/history');
 
 const app = express();
+app.set("trust proxy", 1); // Necesario en Vercel (proxy environment)
 const PORT = process.env.PORT || 3001;
 
 const ALLOWED_ORIGINS = [
