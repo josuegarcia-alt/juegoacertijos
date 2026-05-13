@@ -1,5 +1,4 @@
 require('dotenv').config();
-console.log('KEY ACTIVA:', process.env.GEMINI_API_KEY);
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -12,21 +11,34 @@ const historyRoutes = require('./routes/history');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Security middleware
-app.use(helmet());
-app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
-    'https://juegoacertijos.vercel.app',
-    'http://localhost:3000'
-  ],
-  credentials: true
-}));
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'http://localhost:5500',
+  'https://juegoacertijos.vercel.app',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(helmet({ crossOriginResourcePolicy: false }));
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // responde 200 a todos los preflight
 app.use(express.json());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 100,
   message: { error: 'Too many requests, please try again later.' }
 });
